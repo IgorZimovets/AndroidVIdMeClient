@@ -1,32 +1,34 @@
 package zimovets.igor.com.vidmeclient;
 
 import android.content.Context;
-import android.content.Intent;
-import android.service.notification.StatusBarNotification;
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-   
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import java.lang.reflect.Method;
-
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import zimovets.igor.com.vidmeclient.data.model.AnswersResponse;
+import zimovets.igor.com.vidmeclient.data.remote.ApiUtils;
+import zimovets.igor.com.vidmeclient.data.remote.FeaturedAPI;
 import zimovets.igor.com.vidmeclient.fragment.LoginFragment;
+import zimovets.igor.com.vidmeclient.fragment.PlaceholderVideoFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private Context mContext = this;
     private int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+
+    private FeaturedAPI mFeaturedAPI;
+
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -77,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        //mViewPager.setOffscreenPageLimit(2);
+
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+                //mViewPager.getAdapter().notifyDataSetChanged();
 
             }
 
@@ -100,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-      
+        mFeaturedAPI = ApiUtils.getFeaturedAPI();
+
+       // loadAnswers();
     }
 
     @Override
@@ -135,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.log_out) {
+            SharedPreferences sharedPreferences = getSharedPreferences("My_Pref", MODE_PRIVATE);
+            sharedPreferences.edit().remove("key").apply();
+
             return true;
         }
 
@@ -145,31 +158,60 @@ public class MainActivity extends AppCompatActivity {
   
 
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * A {@link FragmentStatePagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+
+        static final int NUM_ITEMS = 3;
+        private final FragmentManager mFragmentManager;
+        private Fragment mFragmentAtPos3;
+
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            mFragmentManager = fm;
         }
 
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position < 2){
-                return PlaceholderFragment.newInstance(position + 1);
-            }else {
-                Fragment fragment = new LoginFragment();
-                return fragment;
+            if (position == 0){
+                //return PlaceholderVideoFragment.newInstance(position + 1);
+                Log.d("AnswersPresenter", "fragment 1");
+                return PlaceholderVideoFragment.newInstance(position);
+
+            }else if (position == 1){
+                Log.d("AnswersPresenter", "fragment 2");
+               // return new PlaceholderVideoFragment();
+                return PlaceholderVideoFragment.newInstance(position);
+            }
+            else {
+                /*if (mFragmentAtPos3 == null){
+                    mFragmentAtPos3 = new LoginFragment(new FirstPageFragmentListener() {
+                        @Override
+                        public void onSwitchToNextFragment() {
+
+                        }
+                    });
+                }*/
+                SharedPreferences sharedPreferences = getSharedPreferences("My_Pref", MODE_PRIVATE);
+                String value = sharedPreferences.getString("key", "");
+                Log.d("Pref  ", value);
+
+                Log.d("AnswersPresenter", "fragment 3");
+                //Fragment fragment = new LoginFragment();
+                return LoginFragment.newInstance();
+
+
             }
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return NUM_ITEMS;
         }
 
         @Override
@@ -184,40 +226,60 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
+
+       /* @Override
+        public int getItemPosition(Object object) {
+// POSITION_NONE makes it possible to reload the PagerAdapter
+            return POSITION_NONE;
+        }*/
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
 
-        public PlaceholderFragment() {
-        }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
+    private void loadAnswers() {
+
+        // RxJava Implementation
+
+        /*mService.getAnswers().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SOAnswersResponse>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+                    @Override
+                    public void onNext(SOAnswersResponse soAnswersResponse) {
+                        mAnswersView.showAnswers(soAnswersResponse.getItems());
+                    }
+                });*/
+
+        mFeaturedAPI.loadFeaturedVideo(10, 0).enqueue(new Callback<AnswersResponse>() {
+            @Override
+            public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
+
+                if(response.isSuccessful()) {
+                    //mAdapter.updateAnswers(response.body().getItems());
+                    String responseUrl = response.body().getVideos().get(0).getThumbnailUrl();
+                    Log.d("AnswersPresenter", responseUrl);
+                }else {
+                    int statusCode  = response.code();
+                    // handle request errors depending on status code
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AnswersResponse> call, Throwable t) {
+                showErrorMessage();
+                Log.d("AnswersPresenter", "error loading from API");
+
+            }
+        });
+    }
+
+
+    public void showErrorMessage() {
+        Toast.makeText(this, "Error loading posts", Toast.LENGTH_SHORT).show();
     }
 }
