@@ -35,7 +35,6 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
         @BindView(R.id.imageViewPhoto) ImageView mImageViewVideo;
         @BindView(R.id.textViewName) TextView mTextViewName;
         @BindView(R.id.textViewLike) TextView mTextViewLike;
-        @BindView(R.id.progressBar) ProgressBar mProgressBar;
         PostItemListener mItemListener;
 
         public ViewHolder(View itemView, PostItemListener postItemListener) {
@@ -78,20 +77,22 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
 
         ImageView imageView = holder.mImageViewVideo;
         TextView textViewName = holder.mTextViewName;
-
         TextView textViewLike = holder.mTextViewLike;
-        final ProgressBar progressBar = holder.mProgressBar;
-        progressBar.setVisibility(View.GONE);
-        //imageView.setMinimumHeight(50);
-        //imageView.setMinimumWidth(50);
 
-        //Glide.with(mContext).load(item.getWebformatURL()).fitCenter().into(holder.image);
+        /*Set image*/
+        Glide
+             .with(mContext).load(item.getThumbnailUrl())
+             .dontAnimate()
+             .fitCenter()
+             .into(imageView);
+                //.asBitmap()
+                //.diskCacheStrategy(DiskCacheStrategy.RESULT)
+                //.placeholder(R.drawable.place_holde
 
-        //ColorDrawable g = new ColorDrawable(Color.BLUE);
-
-
+        /*Set title*/
         textViewName.setText(item.getTitle());
 
+        /*Set likes*/
         int likesCount = item.getLikesCount();
         String likes = (likesCount > 1 ?
                 likesCount + " " + "likes" :
@@ -105,29 +106,8 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
                 //.centerCrop()
                 .into(imageView);*/
 
-        Glide
-                .with(mContext)
-                .load(item.getThumbnailUrl())
-                //.asBitmap()
-                .dontAnimate()
-                .fitCenter()
-                //.diskCacheStrategy(DiskCacheStrategy.RESULT)
-                //.placeholder(R.drawable.place_holder)
-                .into(imageView);
-                                                 //.centerCrop() fullscreen
-                /*.listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
 
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })*/
+
 
 
 
@@ -139,10 +119,15 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
         return mVideosList.size();
     }
 
-    public void updateAnswers(List<Video> items) {
+    public void updateData(List<Video> items) {
         mVideosList = items;
         Log.d("AnswersPresenter", String.valueOf(items.size()));
 
+        notifyDataSetChanged();
+    }
+
+    public void addNewData(List<Video> items) {
+        mVideosList.addAll(items);
         notifyDataSetChanged();
     }
 

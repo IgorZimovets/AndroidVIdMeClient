@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +32,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import zimovets.igor.com.vidmeclient.EndlessRecyclerViewScrollListener;
 import zimovets.igor.com.vidmeclient.R;
 import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
 import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
@@ -54,11 +54,12 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private WidMeRetrofitApi mWidMeRetrofitApi;
     private RecyclerView mRecyclerView;
     private VideoRecyclerViewAdapter mAdapter;
-    private  RecyclerView.LayoutManager layoutManager;
+    private LinearLayoutManager mLayoutManager;
     private Context mContext;
     private LinearLayout mLinearLayout;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private EndlessRecyclerViewScrollListener mScrollListener;
 
     SharedPreferences prefs;
 
@@ -129,17 +130,28 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mContext = container.getContext();
 
-        layoutManager = new LinearLayoutManager(mContext);
+        mLayoutManager = new LinearLayoutManager(mContext);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_login);
+
+        mScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                loadNewVideos(page);
+            }
+        };
+
+        mRecyclerView.addOnScrollListener(mScrollListener);
 
         if (mAdapter != null){
             Log.d("Answers"," " + mAdapter.getItemCount());
         }
 
 
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", MODE_PRIVATE);
-        boolean value = sharedPreferences.contains("key");
+        prefs = mContext.getSharedPreferences("My_Pref", MODE_PRIVATE);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
+        boolean value = prefs.contains("key");
         if (value){
             mLinearLayout.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
@@ -148,13 +160,9 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
             initAdapter();*/
             createWidMeApi();
-            loadNewVideos();
+            loadNewVideos(0);
 
         }
-
-        prefs = getActivity().getSharedPreferences("My_Pref", MODE_PRIVATE) ;
-        prefs.registerOnSharedPreferenceChangeListener(this);
-
 
         return rootView;
     }
@@ -206,7 +214,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                     Log.d("testk", "Before feedVideo");
                     //mWidMeRetrofitApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
-                    loadNewVideos();
+                    loadNewVideos(0);
                     Log.d("testk", "Before afterVideo");
 
             } else {
@@ -228,18 +236,18 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         }
     };
 
-    Callback<AnswersResponse> userDetailsCallback = new Callback<AnswersResponse>() {
+    /*Callback<AnswersResponse> userDetailsCallback = new Callback<AnswersResponse>() {
         @Override
         public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
             Log.d("testk", "1");
             if (response.isSuccessful()) {
                 Log.d("testk", "TOP");
-                mAdapter.updateAnswers(response.body().getVideos());
-                /*AnswersResponse userDetails = response.body();
+                mAdapter.updateData(response.body().getVideos());
+                *//*AnswersResponse userDetails = response.body();
                 List<Video> list = userDetails.getVideos();
                 Log.d("Test 1 video", list.get(0).getFullUrl() + "\n" +
                         list.get(0).getTitle());
-                Log.d("Test", token.getAuth().getToken());*/
+                Log.d("Test", token.getAuth().getToken());*//*
 
             } else {
 
@@ -252,45 +260,70 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         public void onFailure(Call<AnswersResponse> call, Throwable t) {
             t.printStackTrace();
         }
-    };
+    };*/
 
     private void initAdapter(){
         Log.d("testk", "Insiderep");
-        mAdapter = new VideoRecyclerViewAdapter(mContext, new ArrayList<Video>(0),
-                new VideoRecyclerViewAdapter.PostItemListener() {
 
-                    @Override
-                    public void onPostClick(String url) {
-                        Log.d("AnswersPresenter", url);
-                        Intent intent = new Intent(mContext, VideoPlayerActivity.class); // VideoPlayerActivity.class
-                        intent.putExtra("KEY", url);
-                        startActivity(intent);
+        if (mAdapter == null){
+
+            mAdapter = new VideoRecyclerViewAdapter(mContext, new ArrayList<Video>(0),
+                    new VideoRecyclerViewAdapter.PostItemListener() {
+
+                        @Override
+                        public void onPostClick(String url) {
+                            Log.d("AnswersPresenter", url);
+                            Intent intent = new Intent(mContext, VideoPlayerActivity.class); // VideoPlayerActivity.class
+                            intent.putExtra("KEY", url);
+                            startActivity(intent);
 
                         /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(browserIntent);*/
 
-                    }
-                });
+                        }
+                    });
+        }
 
-        mRecyclerView.setLayoutManager(layoutManager);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
     }
 
-    private void loadNewVideos(){
+    private void loadNewVideos(int page){
 
         /*mWidMeRetrofitApi = null;
         createWidMeApi();*/
 
         initAdapter();
+        int offset = (page == 0 ? 0 : page * 10);
 
-        mWidMeRetrofitApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
+        mWidMeRetrofitApi.getFeedVideo(10, offset).enqueue(new Callback<AnswersResponse>() {
+            @Override
+            public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
+                if (response.isSuccessful()) {
+
+                    if (mAdapter.getItemCount() < 10){
+
+                        mAdapter.updateData(response.body().getVideos());
+                    } else {
+                        mAdapter.addNewData(response.body().getVideos());
+                    }
+
+                } else {
+
+                    Toast.makeText(mContext, "Failure while requesting user details", Toast.LENGTH_LONG).show();
+                    Log.d("UserDetailsCallback", "Code: " + response.code() + "Message: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AnswersResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
-
-    public void showErrorMessage() {
-        Toast.makeText(mContext, "Error loading posts", Toast.LENGTH_SHORT).show();
-    }
 
     @Override
     public void onPause() {
@@ -310,8 +343,12 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         refreshList();
     }
     void refreshList(){
-        mAdapter.updateAnswers(new ArrayList<Video>(0));
-        loadNewVideos();
+        mAdapter.updateData(new ArrayList<Video>(0));
+
+
+        mScrollListener.resetState();
+
+        loadNewVideos(0);
         //do processing to get new data and set your listview's adapter, maybe  reinitialise the loaders you may be using or so
         //when your data has finished loading, cset the refresh state of the view to false
         swipeRefreshLayout.setRefreshing(false);

@@ -20,6 +20,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import zimovets.igor.com.vidmeclient.EndlessRecyclerViewScrollListener;
 import zimovets.igor.com.vidmeclient.R;
 import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
 import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
@@ -49,11 +50,10 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
     private WidMeRetrofitApi mWidMeRetrofitApi;
     private RecyclerView mRecyclerView;
     private VideoRecyclerViewAdapter mAdapter;
-
-
     private Context mContext;// = getActivity().getApplicationContext();
-
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private EndlessRecyclerViewScrollListener mScrollListener;
 
 
     public static PlaceholderVideoFragment newInstance(int sectionNumber) {
@@ -116,47 +116,63 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }*/
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
+        /*RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);*/
+        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
-        //mRecyclerView.setHasFixedSize(true);
 
-        //boolean a = savedInstanceState.isEmpty();
-        //Log.d("AnswersPresenter", String.valueOf(a));
+        mScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                loadDate(page);
+            }
+        };
 
-       // Log.d("Answers"," " + mAdapter.getItemCount());
+        mRecyclerView.addOnScrollListener(mScrollListener);
 
-        loadDate();
+        loadDate(0);
 
 
         return rootView;
     }
 
-    private void loadDate(){
+    private void loadDate(int page){
+
+
+        int offset = (page == 0 ? 0 : page * 10);
+        Log.d("MoreVideo", " off " + offset + " page " + page);
+
+
         if (!getArguments().isEmpty()) {
             int section = getArguments().getInt(ARG_SECTION_NUMBER);
 
             if (section == 0){
                 Log.d("AnswersPresenter", "loadFeatured");
-                loadFeaturedVideos();
+                loadFeaturedVideos(offset);
             }else if (section == 1){
                 Log.d("AnswersPresenter", "loadNew");
-                loadNewVideos();
+                loadNewVideos(offset);
             }
         }
     }
 
-    private void loadFeaturedVideos() {
+    private void loadFeaturedVideos(int offset) {
 
-        mWidMeRetrofitApi.loadFeaturedVideo(10, 0).enqueue(new Callback<AnswersResponse>() {
+        mWidMeRetrofitApi.loadFeaturedVideo(10, offset).enqueue(new Callback<AnswersResponse>() {
             @Override
             public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
 
                 if(response.isSuccessful()) {
 
-                    mAdapter.updateAnswers(response.body().getVideos());
-                    String responseUrl = response.body().getVideos().get(0).getThumbnailUrl();
-                    Log.d("AnswersPresenter", response.raw().request().url().toString());
+                    if (mAdapter.getItemCount() < 10){
+
+                        mAdapter.updateData(response.body().getVideos());
+                    } else {
+                        mAdapter.addNewData(response.body().getVideos());
+                    }
+                    Log.d("MoreVideo", "page : " + mAdapter.getItemCount() + "   Size: " + mAdapter.getItemCount()+ " ");
+                    /*String responseUrl = response.body().getVideos().get(0).getThumbnailUrl();
+                    Log.d("AnswersPresenter", response.raw().request().url().toString());*/
 
                 }else {
                     int statusCode  = response.code();
@@ -173,14 +189,19 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
         });
     }
 
-    private void loadNewVideos(){
+    private void loadNewVideos(int offset){
 
-        mWidMeRetrofitApi.loadNewVideo(10, 0).enqueue(new Callback<AnswersResponse>() {
+        mWidMeRetrofitApi.loadNewVideo(10, offset).enqueue(new Callback<AnswersResponse>() {
             @Override
             public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
 
                 if(response.isSuccessful()) {
-                    mAdapter.updateAnswers(response.body().getVideos());
+                    if (mAdapter.getItemCount() < 10){
+                        mAdapter.updateData(response.body().getVideos());
+                    } else {
+                        mAdapter.addNewData(response.body().getVideos());
+                    }
+
                     String responseUrl = response.body().getVideos().get(0).getThumbnailUrl();
                     Log.d("AnswersPresenter", response.raw().request().url().toString());
 
@@ -209,8 +230,11 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
         refreshList();
     }
     void refreshList(){
-        mAdapter.updateAnswers(new ArrayList<Video>(0));
-        loadDate();
+        mAdapter.updateData(new ArrayList<Video>(0));
+
+        mScrollListener.resetState();
+
+        loadDate(0);
         //do processing to get new data and set your listview's adapter, maybe  reinitialise the loaders you may be using or so
         //when your data has finished loading, cset the refresh state of the view to false
         swipeRefreshLayout.setRefreshing(false);
