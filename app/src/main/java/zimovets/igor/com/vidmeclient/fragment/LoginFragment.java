@@ -32,7 +32,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import zimovets.igor.com.vidmeclient.EndlessRecyclerViewScrollListener;
+import zimovets.igor.com.vidmeclient.util.EndlessRecyclerViewScrollListener;
 import zimovets.igor.com.vidmeclient.R;
 import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
 import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
@@ -236,31 +236,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         }
     };
 
-    /*Callback<AnswersResponse> userDetailsCallback = new Callback<AnswersResponse>() {
-        @Override
-        public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
-            Log.d("testk", "1");
-            if (response.isSuccessful()) {
-                Log.d("testk", "TOP");
-                mAdapter.updateData(response.body().getVideos());
-                *//*AnswersResponse userDetails = response.body();
-                List<Video> list = userDetails.getVideos();
-                Log.d("Test 1 video", list.get(0).getFullUrl() + "\n" +
-                        list.get(0).getTitle());
-                Log.d("Test", token.getAuth().getToken());*//*
-
-            } else {
-
-                Toast.makeText(mContext, "Failure while requesting user details", Toast.LENGTH_LONG).show();
-                Log.d("UserDetailsCallback", "Code: " + response.code() + "Message: " + response.message());
-            }
-        }
-
-        @Override
-        public void onFailure(Call<AnswersResponse> call, Throwable t) {
-            t.printStackTrace();
-        }
-    };*/
 
     private void initAdapter(){
         Log.d("testk", "Insiderep");

@@ -1,4 +1,4 @@
-package zimovets.igor.com.vidmeclient;
+package zimovets.igor.com.vidmeclient.util;
 
 
 import android.support.v7.widget.LinearLayoutManager;

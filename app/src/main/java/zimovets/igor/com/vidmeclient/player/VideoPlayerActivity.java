@@ -151,11 +151,5 @@ public class VideoPlayerActivity extends AppCompatActivity {
             player = null;
         }
     }
-   /* @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (player != null){
-            player.release();
-        }
-    }*/
+
 }

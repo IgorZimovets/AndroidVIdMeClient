@@ -20,7 +20,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import zimovets.igor.com.vidmeclient.EndlessRecyclerViewScrollListener;
+import zimovets.igor.com.vidmeclient.util.EndlessRecyclerViewScrollListener;
 import zimovets.igor.com.vidmeclient.R;
 import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
 import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
