@@ -1,5 +1,5 @@
 
-package zimovets.igor.com.vidmeclient.data.model;
+package zimovets.igor.com.vidmeclient.data.model.video;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

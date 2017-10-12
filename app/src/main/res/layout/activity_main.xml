@@ -9,10 +9,28 @@
               android:orientation="vertical"
               tools:context="zimovets.igor.com.vidmeclient.MainActivity">
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+
+        <ImageView
+            android:id="@+id/button"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:src="@drawable/ic_menu_moreoverflow_normal_holo_light"/>
+
+    </LinearLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container"

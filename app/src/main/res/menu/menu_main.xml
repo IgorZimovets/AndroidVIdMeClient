@@ -2,8 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="zimovets.igor.com.vidmeclient.MainActivity" >
-    <item android:id="@+id/log_out"
-        android:title="@string/log_out"
+    <item
+        android:id="@+id/log_out"
+        android:icon="@drawable/ic_menu_moreoverflow_normal_holo_light"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:title="@string/log_out"
+        app:showAsAction="ifRoom"/>
 </menu>

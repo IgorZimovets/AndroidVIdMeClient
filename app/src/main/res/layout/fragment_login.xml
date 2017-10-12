@@ -7,8 +7,7 @@
               android:paddingBottom="0dp"
               android:paddingLeft="0dp"
               android:paddingRight="0dp"
-              android:paddingTop="0dp"
-              tools:context="zimovets.igor.com.vidmeclient.LoginActivity">
+              android:paddingTop="0dp">
 
     <!-- Login progress -->
 
@@ -29,13 +28,19 @@
         <ScrollView
             android:id="@+id/login_form"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@android:color/background_light">
 
             <LinearLayout
                 android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_gravity="center"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical"
+                android:paddingLeft="64dp"
+                android:paddingRight="64dp">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -45,10 +50,12 @@
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_email"
-                        android:inputType="textEmailAddress"
-                        android:maxLines="1"
-                        android:singleLine="true"/>
+                        android:hint="@string/login_name"
+                        android:inputType="textPersonName"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"/>
+
+
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -66,7 +73,8 @@
                         android:imeOptions="actionUnspecified"
                         android:inputType="textPassword"
                         android:maxLines="1"
-                        android:singleLine="true"/>
+
+                        />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -75,7 +83,8 @@
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="32dp"
+                    android:background="@drawable/my_button"
                     android:text="@string/action_sign_in"
                     android:textStyle="bold"/>
 
@@ -84,10 +93,18 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_login"
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible"/>
+        android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_login"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>
