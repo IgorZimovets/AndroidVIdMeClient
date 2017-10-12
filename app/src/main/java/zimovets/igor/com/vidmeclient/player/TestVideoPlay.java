@@ -1,4 +1,4 @@
-package zimovets.igor.com.vidmeclient;
+package zimovets.igor.com.vidmeclient.player;
 
 import android.net.Uri;
 import android.os.Bundle;

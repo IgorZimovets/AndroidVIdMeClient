@@ -21,8 +21,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import zimovets.igor.com.vidmeclient.R;
-import zimovets.igor.com.vidmeclient.VideoPlayerActivity;
-import zimovets.igor.com.vidmeclient.VideoRecyclerViewAdapter;
+import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
+import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
 import zimovets.igor.com.vidmeclient.data.model.video.AnswersResponse;
 import zimovets.igor.com.vidmeclient.data.model.video.Video;
 import zimovets.igor.com.vidmeclient.data.remote.ApiUtils;
@@ -58,8 +58,6 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
 
     public static PlaceholderVideoFragment newInstance(int sectionNumber) {
 
-        //flag = sectionNumber;
-        //this flag start
 
         PlaceholderVideoFragment fragment = new PlaceholderVideoFragment();
         Bundle args = new Bundle();
@@ -87,8 +85,6 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
         swipeRefreshLayout.setOnRefreshListener(this);
 
         mContext = container.getContext();
-       // TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-       // textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
         mWidMeRetrofitApi = ApiUtils.getFeaturedAPI();
 
@@ -105,15 +101,13 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
                     @Override
                     public void onPostClick(String url) {
                         Log.d("AnswersPresenter", url);
-                        /*Intent intent = new Intent(mContext, FullscreenActivity.class);
+                        Intent intent = new Intent(mContext, VideoPlayerActivity.class); // VideoPlayerActivity.class
                         intent.putExtra("KEY", url);
-                        startActivity(intent);*/
+                        startActivity(intent);
 
                         /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(browserIntent);*/
 
-                        Intent intent = new Intent(mContext, VideoPlayerActivity.class);
-                        startActivity(intent);
                     }
                 });
 
@@ -121,8 +115,6 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }*/
-
-        //mAdapter.setHasStableIds(true); dont update image, but dont flashing
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -155,23 +147,6 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
     }
 
     private void loadFeaturedVideos() {
-
-
-        // RxJava Implementation
-
-        /*mService.getAnswers().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<SOAnswersResponse>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-                    @Override
-                    public void onNext(SOAnswersResponse soAnswersResponse) {
-                        mAnswersView.showAnswers(soAnswersResponse.getItems());
-                    }
-                });*/
 
         mWidMeRetrofitApi.loadFeaturedVideo(10, 0).enqueue(new Callback<AnswersResponse>() {
             @Override

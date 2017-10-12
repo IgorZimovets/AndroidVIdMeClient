@@ -2,6 +2,8 @@ package zimovets.igor.com.vidmeclient;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.view.ViewPager;
@@ -14,8 +16,12 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import zimovets.igor.com.vidmeclient.data.remote.ApiUtils;
-import zimovets.igor.com.vidmeclient.data.remote.WidMeRetrofitApi;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import zimovets.igor.com.vidmeclient.adapters.SectionsPagerAdapter;
 
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -28,11 +34,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private SharedPreferences mSharedPreferences;
 
+    @BindView(R.id.progressBarStartLoad) ProgressBar mProgressBar;
+    @BindView(R.id.textViewNoInternet) TextView mTextViewNoInternet;
+
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +51,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //change
 
         setContentView(R.layout.activity_main);
+
+        ButterKnife.bind(this);
+
+        mProgressBar.setVisibility(View.VISIBLE);
+        mTextViewNoInternet.setVisibility(View.GONE);
 
         mButton = (ImageView) findViewById(R.id.button);
         registerForContextMenu(mButton);
@@ -60,16 +75,32 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mButton.setVisibility(View.GONE);
         }
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), mContext);
-
-        // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+
+        ConnectivityManager cm = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        // Get details on the currently active default data network
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        // If there is a network connection, fetch data
+        if (activeNetwork != null && activeNetwork.isConnected()){
+
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), mContext);
+            // Set up the ViewPager with the sections adapter.
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+
+            mProgressBar.setVisibility(View.GONE);
+
+            tabLayout.setupWithViewPager(mViewPager);
+        }else {
 
 
+            mProgressBar.setVisibility(View.GONE);
+            mTextViewNoInternet.setVisibility(View.VISIBLE);
+
+        }
 
         //mViewPager.setOffscreenPageLimit(2);
 
@@ -96,21 +127,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
             }
         });
-
-
-
     }
-
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-
-        View decorView = getWindow().getDecorView();
-// Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-    }*/
-
+    
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 

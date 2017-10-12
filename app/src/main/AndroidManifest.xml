@@ -3,6 +3,7 @@
           package="zimovets.igor.com.vidmeclient">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/> -->
 
@@ -31,7 +32,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".VideoPlayerActivity"
+        <activity android:name=".player.VideoPlayerActivity"
                   android:configChanges="orientation|keyboardHidden|screenSize"
                   android:label="@string/title_video_player"
                   android:theme="@style/FullscreenTheme">

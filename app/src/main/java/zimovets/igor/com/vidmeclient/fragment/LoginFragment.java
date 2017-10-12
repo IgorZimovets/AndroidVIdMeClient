@@ -34,8 +34,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import zimovets.igor.com.vidmeclient.R;
-import zimovets.igor.com.vidmeclient.VideoPlayerActivity;
-import zimovets.igor.com.vidmeclient.VideoRecyclerViewAdapter;
+import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
+import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
 import zimovets.igor.com.vidmeclient.data.model.user.OAuthTokenBasicAuth;
 import zimovets.igor.com.vidmeclient.data.model.video.AnswersResponse;
 import zimovets.igor.com.vidmeclient.data.model.video.Video;
@@ -49,23 +49,13 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-   // private static final String ARG_SECTION_NUMBER = "section_number";
-
-    //MainActivity.FirstPageFragmentListener mListener;
-
-
     private String credentials = Credentials.basic("igorzimovets", "passZimov30");
-
-    //WidMeRetrofitApi mWidMeRetrofitApi;
-
-
 
     private WidMeRetrofitApi mWidMeRetrofitApi;
     private RecyclerView mRecyclerView;
     private VideoRecyclerViewAdapter mAdapter;
     private  RecyclerView.LayoutManager layoutManager;
     private Context mContext;
-    ViewPager viewPager;
     private LinearLayout mLinearLayout;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -103,10 +93,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             Toast.makeText(mContext, "The password or the name is too short.", Toast.LENGTH_LONG).show();
             return;
         }
-       /* SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString("key", "key").apply();*/
-
-
 
         createWidMeApi();
 
@@ -142,9 +128,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mLinearLayout = (LinearLayout) rootView.findViewById(R.id.linear_layout);
 
         mContext = container.getContext();
-        // TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-        // textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-
 
         layoutManager = new LinearLayoutManager(mContext);
 
@@ -163,7 +146,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
             /*createWidMeApi();
 
-            rep();*/
+            initAdapter();*/
             createWidMeApi();
             loadNewVideos();
 
@@ -258,10 +241,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         list.get(0).getTitle());
                 Log.d("Test", token.getAuth().getToken());*/
 
-                //nameTextView.setText(userDetails.getName() == null ? "no value" : userDetails.getName());
-                //locationTextView.setText(userDetails.getLocation() == null ? "no value" : userDetails.getLocation());
-                // urlTextView.setText(userDetails.getUrl() == null ? "no value" : userDetails.getUrl());
-                //descriptionTextView.setText(userDetails.getDescription().isEmpty() ? "no value" : userDetails.getDescription());
             } else {
 
                 Toast.makeText(mContext, "Failure while requesting user details", Toast.LENGTH_LONG).show();
@@ -275,7 +254,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         }
     };
 
-    private void rep(){
+    private void initAdapter(){
         Log.d("testk", "Insiderep");
         mAdapter = new VideoRecyclerViewAdapter(mContext, new ArrayList<Video>(0),
                 new VideoRecyclerViewAdapter.PostItemListener() {
@@ -283,15 +262,12 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     @Override
                     public void onPostClick(String url) {
                         Log.d("AnswersPresenter", url);
-                        /*Intent intent = new Intent(mContext, FullscreenActivity.class);
+                        Intent intent = new Intent(mContext, VideoPlayerActivity.class); // VideoPlayerActivity.class
                         intent.putExtra("KEY", url);
-                        startActivity(intent);*/
+                        startActivity(intent);
 
                         /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(browserIntent);*/
-
-                        Intent intent = new Intent(mContext, VideoPlayerActivity.class);
-                        startActivity(intent);
 
                     }
                 });
@@ -306,14 +282,10 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         /*mWidMeRetrofitApi = null;
         createWidMeApi();*/
 
-        rep();
+        initAdapter();
 
         mWidMeRetrofitApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
     }
-
-
-
-
 
 
     public void showErrorMessage() {
@@ -356,7 +328,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             mEditTextPass.setText(""); //clear pass field
 
             createWidMeApi();
-            //rep();
+            //initAdapter();
 
 
         }else {

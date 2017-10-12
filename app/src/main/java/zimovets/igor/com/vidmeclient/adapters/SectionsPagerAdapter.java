@@ -1,4 +1,4 @@
-package zimovets.igor.com.vidmeclient;
+package zimovets.igor.com.vidmeclient.adapters;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -16,6 +16,8 @@ import zimovets.igor.com.vidmeclient.fragment.PlaceholderVideoFragment;
  */
 public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
+    public static final String LOG = SectionsPagerAdapter.class.getSimpleName();
+
     static final int NUM_ITEMS = 3;
     Context mContext;
 
@@ -31,13 +33,11 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         if (position == 0){
-            //return PlaceholderVideoFragment.newInstance(position + 1);
-            Log.d("AnswersPresenter", "fragment 1");
+            Log.d(LOG, "fragment 1");
             return PlaceholderVideoFragment.newInstance(position);
 
         }else if (position == 1){
-            Log.d("AnswersPresenter", "fragment 2");
-            // return new PlaceholderVideoFragment();
+            Log.d(LOG, "fragment 2");
             return PlaceholderVideoFragment.newInstance(position);
         }
         else {

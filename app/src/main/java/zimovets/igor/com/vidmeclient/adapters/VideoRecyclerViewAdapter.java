@@ -1,4 +1,4 @@
-package zimovets.igor.com.vidmeclient;
+package zimovets.igor.com.vidmeclient.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,13 +11,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import zimovets.igor.com.vidmeclient.R;
 import zimovets.igor.com.vidmeclient.data.model.video.Video;
 
 /**
@@ -49,9 +49,9 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
         @Override
         public void onClick(View view) {
             Video item = getItem(getAdapterPosition());
-            this.mItemListener.onPostClick(item.getFullUrl());
+            this.mItemListener.onPostClick(item.getFormats().get(0).getUri());
 
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
         }
     }
 
@@ -108,9 +108,13 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
         Glide
                 .with(mContext)
                 .load(item.getThumbnailUrl())
-                //.placeholder(R.mipmap.ic_launcher)
+                //.asBitmap()
                 .dontAnimate()
                 .fitCenter()
+                //.diskCacheStrategy(DiskCacheStrategy.RESULT)
+                //.placeholder(R.drawable.place_holder)
+                .into(imageView);
+                                                 //.centerCrop() fullscreen
                 /*.listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -124,8 +128,7 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
                         return false;
                     }
                 })*/
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                .into(imageView);
+
 
 
 

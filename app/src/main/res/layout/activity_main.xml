@@ -32,10 +32,31 @@
 
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBarStartLoad"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="256dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/textViewNoInternet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="256dp"
+        android:gravity="center"
+        android:text="No Internet connection!"
+        android:visibility="visible"/>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:visibility="visible"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    </android.support.v4.view.ViewPager>
 
 </LinearLayout>

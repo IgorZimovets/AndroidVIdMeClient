@@ -1,4 +1,4 @@
-package zimovets.igor.com.vidmeclient;
+package zimovets.igor.com.vidmeclient.player;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -33,6 +33,8 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+
+import zimovets.igor.com.vidmeclient.R;
 
 
 public class VideoPlayerActivity extends AppCompatActivity {
@@ -76,7 +78,11 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
         //player.seekTo(currentWindow, playbackPosition);
 
-        Uri uri = Uri.parse("https://api.vid.me/video/18175470/stream?format=dash");
+        String urlVideo = getIntent().getStringExtra("KEY");
+        if (urlVideo == null){
+            urlVideo = "https://api.vid.me/video/18175470/stream?format=dash";
+        }
+        Uri uri = Uri.parse(urlVideo);
         MediaSource mediaSource = buildMediaSource(uri);
         player.prepare(mediaSource, true, false);
         player.setPlayWhenReady(true);
