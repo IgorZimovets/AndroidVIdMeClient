@@ -78,6 +78,7 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
 
         ImageView imageView = holder.mImageViewVideo;
         TextView textViewName = holder.mTextViewName;
+
         TextView textViewLike = holder.mTextViewLike;
         final ProgressBar progressBar = holder.mProgressBar;
         progressBar.setVisibility(View.GONE);
@@ -90,7 +91,13 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
 
 
         textViewName.setText(item.getTitle());
-        textViewLike.setText(String.valueOf(item.getLikesCount()));
+
+        int likesCount = item.getLikesCount();
+        String likes = (likesCount > 1 ?
+                likesCount + " " + "likes" :
+                likesCount + " " + "like");
+
+        textViewLike.setText(likes);
 
         /*Picasso.with(mContext)
                 .load(item.getThumbnailUrl())

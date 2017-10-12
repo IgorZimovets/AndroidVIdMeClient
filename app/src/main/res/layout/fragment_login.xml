@@ -32,7 +32,7 @@
             android:background="@android:color/background_light">
 
             <LinearLayout
-                android:id="@+id/email_login_form"
+                android:id="@+id/name_login_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -47,14 +47,13 @@
                     android:layout_height="wrap_content">
 
                     <AutoCompleteTextView
-                        android:id="@+id/email"
+                        android:id="@+id/name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/login_name"
-                        android:inputType="textPersonName"
                         android:imeOptions="actionNext"
+                        android:inputType="textPersonName"
                         android:maxLines="1"/>
-
 
 
                 </android.support.design.widget.TextInputLayout>

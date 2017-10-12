@@ -23,9 +23,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private Context mContext = this;
-    private int currentApiVersion = android.os.Build.VERSION.SDK_INT;
-
-    private WidMeRetrofitApi mWidMeRetrofitApi;
 
     private ImageView mButton;
 
@@ -100,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
-        mWidMeRetrofitApi = ApiUtils.getFeaturedAPI();
+
 
     }
 

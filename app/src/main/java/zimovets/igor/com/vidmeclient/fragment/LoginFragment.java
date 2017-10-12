@@ -14,13 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Credentials;
@@ -53,11 +54,10 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     //MainActivity.FirstPageFragmentListener mListener;
 
 
-    private String credentials = Credentials.basic(
-            "igorzimovets", "passZimov30");
+    private String credentials = Credentials.basic("igorzimovets", "passZimov30");
 
-    WidMeRetrofitApi twitterApi;
-    OAuthTokenBasicAuth token;
+    //WidMeRetrofitApi mWidMeRetrofitApi;
+
 
 
     private WidMeRetrofitApi mWidMeRetrofitApi;
@@ -72,6 +72,11 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     SharedPreferences prefs;
 
+    @BindView(R.id.name)
+    EditText mEditTextName;
+    @BindView(R.id.password)
+    EditText mEditTextPass;
+
 
 
 
@@ -79,16 +84,34 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         // Required empty public constructor
     }
 
+    private String[] getNameAndPass(){
+        String name = mEditTextName.getText().toString().trim();
+        String pass = mEditTextPass.getText().toString().trim();
+
+        String[] data =  {name, pass};
+
+        return data;
+    }
+
     @OnClick(R.id.email_sign_in_button)
     public void click(){
 
+        String[] passAndName = getNameAndPass(); // 0- name , 1- pass
+
+
+        if (passAndName[0].length() == 0 || passAndName[1].length() == 0){
+            Toast.makeText(mContext, "The password or the name is too short.", Toast.LENGTH_LONG).show();
+            return;
+        }
        /* SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("key", "key").apply();*/
 
+
+
         createWidMeApi();
 
-        twitterApi.postCredentials("igorzimovets",
-                "passZimov30").enqueue(tokenCallback);
+        mWidMeRetrofitApi.postCredentials(getNameAndPass()[0], //ts
+                getNameAndPass()[1]).enqueue(tokenCallback);
 
 
     }
@@ -160,20 +183,13 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 Request originalRequest = chain.request();
 
                 boolean has = prefs.contains("key");
-                //Log.d("testk" , String.valueOf(has) + " createWidApi ");
-                /*String myToken;
-                if (has) {
-                    myToken = prefs.getString("key","");
-                } else {
-                    myToken = credentials;
-                }
-                */
 
                 Request.Builder builder = originalRequest.newBuilder()
-                        .header(has ? "AccessToken" : "Authorization",  //Authorization //AccessToken
+                        .header(has ? "AccessToken" : "Authorization",
                                 has ? prefs.getString("key", "") : credentials);
-                //.header("AccessToken",
-                // token != null ? token.getAuth().getToken() : credentials);
+
+                //Log.d("what", has ? prefs.getString("key", "") : credentials );
+
 
                 Request newRequest = builder.build();
                 return chain.proceed(newRequest);
@@ -185,31 +201,40 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
-        twitterApi = retrofit.create(WidMeRetrofitApi.class);
+        mWidMeRetrofitApi = null;
+        mWidMeRetrofitApi = retrofit.create(WidMeRetrofitApi.class);
         Log.d("testk", "End create vid me api");
     }
 
     Callback<OAuthTokenBasicAuth> tokenCallback = new Callback<OAuthTokenBasicAuth>() {
         @Override
         public void onResponse(Call<OAuthTokenBasicAuth> call, Response<OAuthTokenBasicAuth> response) {
+
             if (response.isSuccessful()) {
 
-                token = response.body();
+                   // response.errorBody().contentLength(); // pass 92
+                                                            // name 85
 
-                SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", Context.MODE_PRIVATE);
-                String temp = response.body().getAuth().getToken();
-                sharedPreferences.edit().putString("key", temp).apply();
+                    SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", Context.MODE_PRIVATE);
+                    String temp = response.body().getAuth().getToken();
+                    sharedPreferences.edit().putString("key", temp).apply();
 
-                Log.d("testk", temp);
+                    Log.d("testk", temp);
 
-                Log.d("testk", "Before feedVideo");
-                //twitterApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
-                loadNewVideos();
-                Log.d("testk", "Before afterVideo");
-                //rep();
+                    Log.d("testk", "Before feedVideo");
+                    //mWidMeRetrofitApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
+                    loadNewVideos();
+                    Log.d("testk", "Before afterVideo");
+
             } else {
-                Toast.makeText(mContext, "Failure while requesting token", Toast.LENGTH_LONG).show();
+
+                if (response.errorBody().contentLength() == 85){
+
+                    Toast.makeText(mContext, "Please enter a valid name.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mContext, "The password you entered was not valid.", Toast.LENGTH_LONG).show();
+                }
+
                 Log.d("RequestTokenCallback", "Code: " + response.code() + "Message: " + response.message());
             }
         }
@@ -238,6 +263,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 // urlTextView.setText(userDetails.getUrl() == null ? "no value" : userDetails.getUrl());
                 //descriptionTextView.setText(userDetails.getDescription().isEmpty() ? "no value" : userDetails.getDescription());
             } else {
+
                 Toast.makeText(mContext, "Failure while requesting user details", Toast.LENGTH_LONG).show();
                 Log.d("UserDetailsCallback", "Code: " + response.code() + "Message: " + response.message());
             }
@@ -277,12 +303,12 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private void loadNewVideos(){
 
-        /*twitterApi = null;
+        /*mWidMeRetrofitApi = null;
         createWidMeApi();*/
 
         rep();
 
-        twitterApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
+        mWidMeRetrofitApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
     }
 
 
@@ -327,8 +353,9 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         if (prefs.contains("key")){
             mLinearLayout.setVisibility(View.GONE);
             swipeRefreshLayout.setVisibility(View.VISIBLE);
+            mEditTextPass.setText(""); //clear pass field
 
-
+            createWidMeApi();
             //rep();
 
 

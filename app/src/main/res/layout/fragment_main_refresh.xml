@@ -15,7 +15,7 @@
         android:layout_marginRight="0dp"
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
-        android:background="@android:color/holo_blue_light"
+        android:background="@color/exo_edit_mode_background_color"
         />
 
 </android.support.v4.widget.SwipeRefreshLayout>
