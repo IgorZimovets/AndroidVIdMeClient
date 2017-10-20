@@ -11,23 +11,23 @@ public class OAuthTokenBasicAuth {
     @SerializedName("auth")
     @Expose
     private Auth auth;
-    @SerializedName("user")
+    /*@SerializedName("user")
     @Expose
-    private User user;
+    private User user;*/
 
-    public Boolean getStatus() {
+    /*public Boolean getStatus() {
         return status;
     }
 
     public void setStatus(Boolean status) {
         this.status = status;
-    }
+    }*/
 
     public Auth getAuth() {
         return auth;
     }
 
-    public void setAuth(Auth auth) {
+    /*public void setAuth(Auth auth) {
         this.auth = auth;
     }
 
@@ -37,6 +37,6 @@ public class OAuthTokenBasicAuth {
 
     public void setUser(User user) {
         this.user = user;
-    }
+    }*/
 
 }

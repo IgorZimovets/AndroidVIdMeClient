@@ -1,3 +1,4 @@
+/*
 package zimovets.igor.com.vidmeclient.data.model.user;
 
 import com.google.gson.annotations.Expose;
@@ -238,4 +239,4 @@ public class User {
         this.subEnabled = subEnabled;
     }
 
-}
+}*/

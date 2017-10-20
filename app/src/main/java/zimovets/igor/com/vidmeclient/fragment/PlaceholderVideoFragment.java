@@ -53,6 +53,8 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
     private Context mContext;// = getActivity().getApplicationContext();
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private int marker;
+
     private EndlessRecyclerViewScrollListener mScrollListener;
 
 

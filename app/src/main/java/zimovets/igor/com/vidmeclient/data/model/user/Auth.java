@@ -8,18 +8,18 @@ public class Auth {
     @SerializedName("token")
     @Expose
     private String token;
-    @SerializedName("expires")
+    /*@SerializedName("expires")
     @Expose
     private String expires;
     @SerializedName("user_id")
     @Expose
-    private String userId;
+    private String userId;*/
 
     public String getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+   /* public void setToken(String token) {
         this.token = token;
     }
 
@@ -37,6 +37,6 @@ public class Auth {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
+    }*/
 
 }
