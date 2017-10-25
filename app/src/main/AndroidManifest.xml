@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".player.VideoPlayerActivity"
+        <activity android:name=".player.MediaPlayerActivity"
                   android:configChanges="orientation|keyboardHidden|screenSize"
                   android:label="@string/title_video_player"
                   android:theme="@style/FullscreenTheme">

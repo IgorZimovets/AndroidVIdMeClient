@@ -1,249 +1,122 @@
+/*
 package zimovets.igor.com.vidmeclient.player;
 
-import android.net.Uri;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.net.Uri;
 import android.util.Log;
-import android.view.Surface;
-import android.widget.TextView;
-
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.LoadControl;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.decoder.DecoderCounters;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.LoopingMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.video.VideoRendererEventListener;
+import android.widget.MediaController;
+import android.widget.VideoView;
 
 import zimovets.igor.com.vidmeclient.R;
 
+public class MediaPlayerActivity extends AppCompatActivity {
 
 
-/*
-Created by: Ayal Fieldust
-Date: 8/2017
+    private VideoView videoView;
+    private int position = 0;
+    private MediaController mediaController;
 
-Description:
-This Example app was created to show a simple example of ExoPlayer Version 2.5.1.
-There is an option to play mp4 files or live stream content.
-Exoplayer provides options to play many different formats, so the code can easily be tweaked to play the requested format.
-scroll down to "ADJUST HERE:" I & II to change between sources.
- */
-
-public class TestVideoPlay extends AppCompatActivity implements VideoRendererEventListener {
-
-
-    private static final String TAG = "MainActivity";
-    private SimpleExoPlayerView simpleExoPlayerView;
-    private SimpleExoPlayer player;
-    private TextView resolutionTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
-        //resolutionTextView = new TextView(this);
-        //resolutionTextView = (TextView) findViewById(R.id.resolution_textView);
-
-// 1. Create a default TrackSelector
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-
-// 2. Create a default LoadControl
-        LoadControl loadControl = new DefaultLoadControl();
-
-// 3. Create the player
-        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-        simpleExoPlayerView = new SimpleExoPlayerView(this);
-        simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.videoView);
-
-//Set media controller
-        simpleExoPlayerView.setUseController(true);
-        simpleExoPlayerView.requestFocus();
-
-// Bind the player to the view.
-        simpleExoPlayerView.setPlayer(player);
 
 
-// I. ADJUST HERE:
-//CHOOSE CONTENT: LiveStream / SdCard
-
-//LIVE STREAM SOURCE: * Livestream links may be out of date so find any m3u8 files online and replace:
-
-//        Uri mp4VideoUri =Uri.parse("http://81.7.13.162/hls/ss1/index.m3u8"); //random 720p source
-        Uri mp4VideoUri =Uri.parse("https://api.vid.me/video/18175470/stream?format=hls"); //Radnom 540p indian channel
-//        Uri mp4VideoUri =Uri.parse("FIND A WORKING LINK ABD PLUg INTO HERE"); //PLUG INTO HERE<------------------------------------------
+        videoView = (VideoView) findViewById(R.id.videoView);
 
 
-//VIDEO FROM SD CARD: (2 steps. set up file and path, then change videoSource to get the file)
-//        String urimp4 = "path/FileName.mp4"; //upload file to device and add path/name.mp4
-//        Uri mp4VideoUri = Uri.parse(Environment.getExternalStorageDirectory().getAbsolutePath()+urimp4);
+        // Set the media controller buttons
+        if (mediaController == null) {
+            mediaController = new MediaController(MediaPlayerActivity.this);
+
+            // Set the videoView that acts as the anchor for the MediaController.
+            mediaController.setAnchorView(videoView);
 
 
+            // Set MediaController for VideoView
+            videoView.setMediaController(mediaController);
+
+        }
 
 
+        try {
+            // ID of video file.
+            //int id = this.getRawResIdByName("myvideo");
 
-//Measures bandwidth during playback. Can be null if not required.
-        DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
-//Produces DataSource instances through which media data is loaded.
-        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "VidMeClient"), bandwidthMeterA);
-//Produces Extractor instances for parsing the media data.
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            String videoUrl="https://api.vid.me/video/18175470/stream?format=dash"; // dash
+            //videoUrl = "http://www.youtubemaza.com/files/data/366/Tom%20And%20Jerry%20055%20Casanova%20Cat%20(1951).mp4";
+            Uri video = Uri.parse(videoUrl);
+            videoView.setVideoURI(video);
+
+            //videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + id));
+
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+
+        videoView.requestFocus();
 
 
-// II. ADJUST HERE:
+        // When the video file ready for playback.
+        videoView.setOnPreparedListener(new OnPreparedListener() {
 
-//This is the MediaSource representing the media to be played:
-//FOR SD CARD SOURCE:
-//        MediaSource videoSource = new ExtractorMediaSource(mp4VideoUri, dataSourceFactory, extractorsFactory, null, null);
+            public void onPrepared(MediaPlayer mediaPlayer) {
 
-//FOR LIVESTREAM LINK:
-        MediaSource videoSource = new HlsMediaSource(mp4VideoUri, dataSourceFactory, 1, null, null);
-        final LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
 
-// Prepare the player with the source.
-        player.prepare(loopingSource);
+                videoView.seekTo(position);
+                if (position == 0) {
+                    videoView.start();
+                }
 
-        player.addListener(new ExoPlayer.EventListener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-                Log.v(TAG, "Listener-onTimelineChanged...");
-            }
+                // When video Screen change size.
+                mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
 
-            @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-                Log.v(TAG, "Listener-onTracksChanged...");
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-                Log.v(TAG, "Listener-onLoadingChanged...isLoading:"+isLoading);
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                Log.v(TAG, "Listener-onPlayerStateChanged..." + playbackState);
-            }
-
-            /*@Override
-            public void onRepeatModeChanged(int repeatMode) {
-                Log.v(TAG, "Listener-onRepeatModeChanged...");
-            }*/
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-                Log.v(TAG, "Listener-onPlayerError...");
-                player.stop();
-                player.prepare(loopingSource);
-                player.setPlayWhenReady(true);
-            }
-
-            @Override
-            public void onPositionDiscontinuity() {
-                Log.v(TAG, "Listener-onPositionDiscontinuity...");
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-                Log.v(TAG, "Listener-onPlaybackParametersChanged...");
+                        // Re-Set the videoView that acts as the anchor for the MediaController
+                        mediaController.setAnchorView(videoView);
+                    }
+                });
             }
         });
 
-        player.setPlayWhenReady(true); //run file/link when ready to play.
-        player.setVideoDebugListener(this); //for listening to resolution change and  outputing the resolution
-    }//End of onCreate
-
-    @Override
-    public void onVideoEnabled(DecoderCounters counters) {
-
     }
 
-    @Override
-    public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
-
-    }
-
-    @Override
-    public void onVideoInputFormatChanged(Format format) {
-
-    }
-
-    @Override
-    public void onDroppedFrames(int count, long elapsedMs) {
-
-    }
-
-    @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        Log.v(TAG, "onVideoSizeChanged ["  + " width: " + width + " height: " + height + "]");
-        resolutionTextView.setText("RES:(WxH):"+width+"X"+height +"\n           "+height+"p");
-    }
-
-    @Override
-    public void onRenderedFirstFrame(Surface surface) {
-
-    }
-
-    @Override
-    public void onVideoDisabled(DecoderCounters counters) {
-
+    // Find ID corresponding to the name of the resource (in the directory raw).
+    public int getRawResIdByName(String resName) {
+        String pkgName = this.getPackageName();
+        // Return 0 if not found.
+        int resID = this.getResources().getIdentifier(resName, "raw", pkgName);
+        Log.i("AndroidVideoView", "Res Name: " + resName + "==> Res ID = " + resID);
+        return resID;
     }
 
 
-
-
-//-------------------------------------------------------ANDROID LIFECYCLE---------------------------------------------------------------------------------------------
-
+    // When you change direction of phone, this method will be called.
+    // It store the state of video (Current position)
     @Override
-    protected void onStop() {
-        super.onStop();
-        Log.v(TAG, "onStop()...");
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        // Store current position.
+        savedInstanceState.putInt("CurrentPosition", videoView.getCurrentPosition());
+        videoView.pause();
     }
 
+
+    // After rotating the phone. This method is called.
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.v(TAG, "onStart()...");
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Get saved position.
+        position = savedInstanceState.getInt("CurrentPosition");
+        videoView.seekTo(position);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.v(TAG, "onResume()...");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.v(TAG, "onPause()...");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.v(TAG, "onDestroy()...");
-        player.release();
-    }
-}
-
+}*/

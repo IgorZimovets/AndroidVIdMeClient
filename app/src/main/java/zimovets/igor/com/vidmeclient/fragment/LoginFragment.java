@@ -32,9 +32,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import zimovets.igor.com.vidmeclient.player.MediaPlayerActivity;
 import zimovets.igor.com.vidmeclient.util.EndlessRecyclerViewScrollListener;
 import zimovets.igor.com.vidmeclient.R;
-import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
+
 import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
 import zimovets.igor.com.vidmeclient.data.model.user.OAuthTokenBasicAuth;
 import zimovets.igor.com.vidmeclient.data.model.video.AnswersResponse;
@@ -98,12 +99,49 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         createWidMeApi();
 
         mWidMeRetrofitApi.postCredentials(getNameAndPass()[0], //ts
-                getNameAndPass()[1]).enqueue(tokenCallback);
+                getNameAndPass()[1]).enqueue(new Callback<OAuthTokenBasicAuth>() {
+            @Override
+            public void onResponse(Call<OAuthTokenBasicAuth> call, Response<OAuthTokenBasicAuth> response) {
+
+                if (response.isSuccessful()) {
+
+                    // response.errorBody().contentLength(); // pass 92
+                    // name 85
+
+                    SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", Context.MODE_PRIVATE);
+                    String temp = response.body().getAuth().getToken();
+                    sharedPreferences.edit().putString("key", temp).apply();
+
+                    Log.d("testk", temp);
+
+                    Log.d("testk", "Before feedVideo");
+                    //mWidMeRetrofitApi.getFeedVideo(10,0).enqueue(userDetailsCallback);
+                    loadNewVideos(0);
+                    Log.d("testk", "Before afterVideo");
+
+                } else {
+
+                    if (response.errorBody().contentLength() == 85){
+
+                        Toast.makeText(mContext, "Please enter a valid name.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(mContext, "The password you entered was not valid.", Toast.LENGTH_LONG).show();
+                    }
+
+                    Log.d("RequestTokenCallback", "Code: " + response.code() + "Message: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OAuthTokenBasicAuth> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
 
 
     }
 
-    public static LoginFragment newInstance(/*MainActivity.FirstPageFragmentListener listener*/) {
+    public static LoginFragment newInstance(/*MediaPlayerActivity.FirstPageFragmentListener listener*/) {
 
 
         LoginFragment fragment = new LoginFragment();
@@ -168,7 +206,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     }
 
     private void createWidMeApi() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+        /*OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
                 Request originalRequest = chain.request();
@@ -177,7 +215,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                 Request.Builder builder = originalRequest.newBuilder()
                         .header(has ? "AccessToken" : "Authorization",
-                                has ? prefs.getString("key", "") : credentials);
+                                has ? prefs.getString("key", "") : ""*//*credentials*//*);
 
                 //Log.d("what", has ? prefs.getString("key", "") : credentials );
 
@@ -189,11 +227,13 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiUtils.BASE_URL)
-                .client(okHttpClient)
+               // .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         mWidMeRetrofitApi = null;
-        mWidMeRetrofitApi = retrofit.create(WidMeRetrofitApi.class);
+        mWidMeRetrofitApi = retrofit.create(WidMeRetrofitApi.class);*/
+
+        mWidMeRetrofitApi = ApiUtils.getFeaturedAPI();
         Log.d("testk", "End create vid me api");
     }
 
@@ -248,7 +288,7 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         @Override
                         public void onPostClick(String url) {
                             Log.d("AnswersPresenter", url);
-                            Intent intent = new Intent(mContext, VideoPlayerActivity.class); // VideoPlayerActivity.class
+                            Intent intent = new Intent(mContext, MediaPlayerActivity.class); // VideoPlayerActivity.class
                             intent.putExtra("KEY", url);
                             startActivity(intent);
 
@@ -273,7 +313,10 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         initAdapter();
         int offset = (page == 0 ? 0 : page * 10);
 
-        mWidMeRetrofitApi.getFeedVideo(10, offset).enqueue(new Callback<AnswersResponse>() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("My_Pref", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("key", "");
+
+        mWidMeRetrofitApi.getFeedVideo(token, 10, offset).enqueue(new Callback<AnswersResponse>() {
             @Override
             public void onResponse(Call<AnswersResponse> call, Response<AnswersResponse> response) {
                 if (response.isSuccessful()) {
@@ -341,7 +384,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
             createWidMeApi();
             //initAdapter();
-
 
         }else {
             mAdapter = null;

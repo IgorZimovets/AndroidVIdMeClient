@@ -20,9 +20,10 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import zimovets.igor.com.vidmeclient.player.MediaPlayerActivity;
 import zimovets.igor.com.vidmeclient.util.EndlessRecyclerViewScrollListener;
 import zimovets.igor.com.vidmeclient.R;
-import zimovets.igor.com.vidmeclient.player.VideoPlayerActivity;
+
 import zimovets.igor.com.vidmeclient.adapters.VideoRecyclerViewAdapter;
 import zimovets.igor.com.vidmeclient.data.model.video.AnswersResponse;
 import zimovets.igor.com.vidmeclient.data.model.video.Video;
@@ -103,7 +104,7 @@ public class PlaceholderVideoFragment  extends Fragment implements SwipeRefreshL
                     @Override
                     public void onPostClick(String url) {
                         Log.d("AnswersPresenter", url);
-                        Intent intent = new Intent(mContext, VideoPlayerActivity.class); // VideoPlayerActivity.class
+                        Intent intent = new Intent(mContext, MediaPlayerActivity.class); // VideoPlayerActivity.class
                         intent.putExtra("KEY", url);
                         startActivity(intent);
 

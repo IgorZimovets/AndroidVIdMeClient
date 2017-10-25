@@ -4,14 +4,14 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HEAD;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 import zimovets.igor.com.vidmeclient.data.model.user.OAuthTokenBasicAuth;
 import zimovets.igor.com.vidmeclient.data.model.video.AnswersResponse;
 
-/**
- * Created by PC on 08.10.2017.
- */
 
 public interface WidMeRetrofitApi {
 
@@ -28,7 +28,8 @@ public interface WidMeRetrofitApi {
     Call<OAuthTokenBasicAuth> postCredentials(@Field("username") String name,
                                               @Field("password") String pass);
     @GET("videos/feed/")
-    Call<AnswersResponse> getFeedVideo(@Query("limit") Integer limit,
+    Call<AnswersResponse> getFeedVideo(@Header("AccessToken") String token,
+                                       @Query("limit") Integer limit,
                                        @Query("offset") Integer offset);
 
 }
