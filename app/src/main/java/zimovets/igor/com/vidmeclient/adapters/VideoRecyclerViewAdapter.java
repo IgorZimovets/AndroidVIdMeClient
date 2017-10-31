@@ -20,9 +20,7 @@ import butterknife.ButterKnife;
 import zimovets.igor.com.vidmeclient.R;
 import zimovets.igor.com.vidmeclient.data.model.video.Video;
 
-/**
- * Created by PC on 07.10.2017.
- */
+
 
 public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecyclerViewAdapter.ViewHolder> {
 
@@ -74,6 +72,7 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
     @Override
     public void onBindViewHolder(VideoRecyclerViewAdapter.ViewHolder holder, int position) {
         Video item = mVideosList.get(position);
+        //Log.d("Test1", item.getThumbnailUrl());
 
         ImageView imageView = holder.mImageViewVideo;
         TextView textViewName = holder.mTextViewName;
@@ -82,12 +81,10 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
         /*Set image*/
         Glide
              .with(mContext).load(item.getThumbnailUrl())
+                .placeholder(R.mipmap.default_placeholder_750x415)
              .dontAnimate()
              .fitCenter()
              .into(imageView);
-                //.asBitmap()
-                //.diskCacheStrategy(DiskCacheStrategy.RESULT)
-                //.placeholder(R.drawable.place_holde
 
         /*Set title*/
         textViewName.setText(item.getTitle());
@@ -99,18 +96,6 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
                 likesCount + " " + "like");
 
         textViewLike.setText(likes);
-
-        /*Picasso.with(mContext)
-                .load(item.getThumbnailUrl())
-                //.fit()
-                //.centerCrop()
-                .into(imageView);*/
-
-
-
-
-
-
 
     }
 

@@ -23,19 +23,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import zimovets.igor.com.vidmeclient.adapters.SectionsPagerAdapter;
 
- /*
- COMPLETED - api models generated without thinking(a lot of redundant fields)
- TODO - videos doesn’t play
- TODO - a video player implementation taken from the web is in the project, though it’s unused
-
- TODO - empty video list case isn’t handled(tested on Google Pixel(Android O)
- TODO - after logging in the feed for the user doesn’t load
-
- TODO - Retrofit is created both in a special class and in a fragment
- TODO - there is some mess in code
- */
-
-
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 

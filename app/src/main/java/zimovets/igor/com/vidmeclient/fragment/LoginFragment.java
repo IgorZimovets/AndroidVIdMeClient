@@ -50,7 +50,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private String credentials = Credentials.basic("igorzimovets", "passZimov30");
+    //private String credentials = Credentials.basic("igorzimovets", "passZimov30");
 
     private WidMeRetrofitApi mWidMeRetrofitApi;
     private RecyclerView mRecyclerView;
@@ -156,7 +156,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
          View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-        //viewPager = (ViewPager) container;
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -206,33 +205,6 @@ public class LoginFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     }
 
     private void createWidMeApi() {
-        /*OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request originalRequest = chain.request();
-
-                boolean has = prefs.contains("key");
-
-                Request.Builder builder = originalRequest.newBuilder()
-                        .header(has ? "AccessToken" : "Authorization",
-                                has ? prefs.getString("key", "") : ""*//*credentials*//*);
-
-                //Log.d("what", has ? prefs.getString("key", "") : credentials );
-
-
-                Request newRequest = builder.build();
-                return chain.proceed(newRequest);
-            }
-        }).build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-               // .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        mWidMeRetrofitApi = null;
-        mWidMeRetrofitApi = retrofit.create(WidMeRetrofitApi.class);*/
-
         mWidMeRetrofitApi = ApiUtils.getFeaturedAPI();
         Log.d("testk", "End create vid me api");
     }

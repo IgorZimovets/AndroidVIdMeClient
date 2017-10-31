@@ -10,11 +10,7 @@ public class Format {
     @Expose
     private String uri;
 
-
-
     public String getUri() {
         return uri;
     }
-
-
 }

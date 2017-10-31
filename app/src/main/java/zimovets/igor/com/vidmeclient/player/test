@@ -1,0 +1,100 @@
+package zimovets.igor.com.vidmeclient.player;
+
+import android.annotation.SuppressLint;
+import android.media.AudioManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.media.MediaPlayer;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.widget.MediaController;
+
+
+import java.io.IOException;
+
+import zimovets.igor.com.vidmeclient.R;
+
+public class MediaPlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback, MediaPlayer.OnPreparedListener {
+
+    private SurfaceView mSurfaceView;
+    private MediaPlayer mMediaPlayer;
+    private SurfaceHolder mSurfaceHolder;
+    private MediaController mediaController;
+    private static final String VIDEO_PATH =
+            "http://www.youtubemaza.com/files/data/366/" +
+                    "Tom%20And%20Jerry%20055%20Casanova%20Cat%20(1951).mp4";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_video_player);
+        mSurfaceView = (SurfaceView)findViewById(R.id.surface_view);
+        mSurfaceHolder = mSurfaceView.getHolder();
+        mSurfaceHolder.addCallback(MediaPlayerActivity.this);
+
+        mSurfaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideSystemUi();
+            }
+        });
+
+
+    }
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setDisplay(mSurfaceHolder);
+        try {
+            mMediaPlayer.setDataSource(VIDEO_PATH);
+            mMediaPlayer.prepare();
+            mMediaPlayer.setOnPreparedListener(MediaPlayerActivity.this);
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    }
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+    }
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mMediaPlayer.start();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        hideSystemUi();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseMediaPlayer();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseMediaPlayer();
+    }
+    private void releaseMediaPlayer() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+        mSurfaceView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+}

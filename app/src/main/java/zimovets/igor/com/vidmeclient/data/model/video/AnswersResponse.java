@@ -23,9 +23,4 @@ public class AnswersResponse {
         return videos;
     }
 
-    public void setVideos(List<Video> videos) {
-        this.videos = videos;
-    }
-
-
 }
